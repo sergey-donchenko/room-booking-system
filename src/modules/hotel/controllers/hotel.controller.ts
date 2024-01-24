@@ -35,8 +35,6 @@ import {
 } from "@nestjs/swagger"
 
 
-
-
 @ApiTags('The hotel API ')
 @Controller('hotels')
 @UseInterceptors(ClassSerializerInterceptor)

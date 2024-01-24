@@ -1,1 +1,1 @@
-export * from "./hotel.controller"
+export * from "./reservations.controller"

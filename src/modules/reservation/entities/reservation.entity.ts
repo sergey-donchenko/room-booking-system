@@ -3,7 +3,7 @@ import { Exclude, Expose } from "class-transformer"
 import { EReservationStatus } from "../enum/reservation.enum"
 import { IUser } from "../../user/interfaces"
 import { IHotelRoom } from "../../hotel/interfaces";
-import { IReservation } from "../interfaces/reservation.interface"
+import { IReservation } from "../interfaces"
 
 import {
     Entity,
