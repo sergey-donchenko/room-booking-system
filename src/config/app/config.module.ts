@@ -1,5 +1,5 @@
 import * as Joi from '@hapi/joi';
-import { Module } from '@nestjs/common';
+import {Global, Module} from '@nestjs/common';
 import configuration from './configuration';
 import { AppConfigService } from './config.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
  *
  * @module
  */
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({

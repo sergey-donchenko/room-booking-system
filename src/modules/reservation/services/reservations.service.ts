@@ -1,8 +1,8 @@
-import { IReservation } from "../interfaces"
-import { ReservationEntity } from "../entities"
-import {Repository, ILike, Brackets} from "typeorm"
-import { InjectRepository } from "@nestjs/typeorm"
-import { Injectable, NotFoundException } from "@nestjs/common"
+import {IReservation} from "../interfaces"
+import {ReservationEntity} from "../entities"
+import {Brackets, Repository} from "typeorm"
+import {InjectRepository} from "@nestjs/typeorm"
+import {Injectable, NotFoundException} from "@nestjs/common"
 import {IHotelRoom} from "../../hotel/interfaces";
 import {EReservationStatus} from "../enum/reservation.enum";
 
@@ -13,8 +13,15 @@ export class ReservationsService {
         private readonly reservationRepository: Repository<ReservationEntity>,
     ) {}
 
-    async get(id: string, required = true) {
-        const reservation = await this.reservationRepository.findOneBy({ id });
+    async get(
+        id: string,
+        required = true,
+        relations?: any
+    ) {
+        const reservation = await this.reservationRepository.findOne({
+            where: { id },
+            relations: relations || {},
+        });
 
         if (required && !reservation) {
             throw new NotFoundException(`There isn't any reservation with id: ${id}`);
@@ -57,5 +64,17 @@ export class ReservationsService {
             .getExists()
 
         return !reservation
+    }
+
+    async setStatusCancelled(reservation: IReservation): Promise<IReservation> {
+        return this.reservationRepository.save({
+            ...reservation,
+            status: EReservationStatus.CANCELLED,
+            updatedAt: new Date()
+        })
+    }
+
+    isStatusCancelled(reservation: IReservation): boolean {
+        return reservation?.status === EReservationStatus.CANCELLED
     }
 }

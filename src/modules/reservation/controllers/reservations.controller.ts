@@ -17,7 +17,7 @@ import {
     Controller,
     UseInterceptors,
     SerializeOptions,
-    ClassSerializerInterceptor, BadRequestException
+    ClassSerializerInterceptor, BadRequestException, Get, Query, Patch
 } from "@nestjs/common"
 
 import {
@@ -31,7 +31,9 @@ import {
     HotelRoomsService
 } from "../../hotel/services"
 import {GROUP_USER} from "../../user/user.constant";
-import {GROUP_HOTEL_ROOM} from "../../hotel/constants";
+import {GROUP_ALL_HOTELS, GROUP_HOTEL_ROOM} from "../../hotel/constants";
+import {CacheInterceptor, CacheTTL} from "@nestjs/cache-manager";
+import {QueryParamsDTO} from "../../../common/dto/queryParams.dto";
 
 @ApiTags('The reservations API')
 @Controller('reservations')
@@ -157,5 +159,159 @@ export class ReservationsController {
         return {
             reservation
         }
+    }
+
+    @Public()
+    @Get('/:reservationId')
+    @HttpCode(HttpStatus.OK)
+    @UseInterceptors(CacheInterceptor)
+    @SerializeOptions({
+        groups: [
+            GROUP_USER,
+            GROUP_HOTEL_ROOM,
+            GROUP_RESERVATION
+        ]
+    })
+    @ApiOperation({summary: 'Provides the reservation\'s details.'})
+    @ApiOkResponse({
+        status: HttpStatus.OK,
+        description: 'The list of hotels in the system.',
+        schema: {
+            example: {
+                "data": {
+                    "reservation": {
+                        "id": "85be7d50-060f-4de0-ba3f-8e601decf0d7",
+                        "comment": "Just a simple comment",
+                        "startDate": "2024-02-17T00:00:00.000Z",
+                        "endDate": "2024-02-22T00:00:00.000Z",
+                        "createdAt": "2024-01-24T18:50:52.528Z",
+                        "updatedAt": "2024-01-24T18:50:52.528Z",
+                        "user": {
+                            "id": "43a54d35-dd62-410d-91ab-b35324e620d4",
+                            "email": "sergey.donchenko@gmail.com",
+                            "fullname": "Serhii",
+                            "address": null,
+                            "phone": "+380663665112",
+                            "createdAt": "2024-01-24T16:17:13.226Z",
+                            "updatedAt": "2024-01-24T16:17:13.226Z"
+                        },
+                        "room": {
+                            "id": "853af878-1a61-49f9-8801-c2203fa9f642",
+                            "title": "152",
+                            "description": "Turba cursim speculum sto.",
+                            "createdAt": "2024-01-24T14:33:05.746Z",
+                            "updatedAt": "2024-01-24T14:33:05.746Z"
+                        }
+                    }
+                },
+                "success": true,
+                "path": "/reservations/85be7d50-060f-4de0-ba3f-8e601decf0d7",
+                "status": 200
+            }
+        },
+    })
+    async getReservationById(
+        @Param('reservationId') reservationId: string
+    ): Promise<any> {
+        const reservation = await this.reservationsService
+            .get(
+                reservationId,
+                true,
+                { user: true, room: true }
+            )
+
+        return {
+            reservation
+        };
+    }
+
+    @Public()
+    @Patch('/:reservationId/cancel')
+    @HttpCode(HttpStatus.OK)
+    @UseInterceptors(CacheInterceptor)
+    @SerializeOptions({
+        groups: [
+            GROUP_USER,
+            GROUP_HOTEL_ROOM,
+            GROUP_RESERVATION
+        ]
+    })
+    @ApiOperation({summary: 'Provides the reservation\'s details.'})
+    @ApiOkResponse({
+        status: HttpStatus.OK,
+        description: 'The list of hotels in the system.',
+        schema: {
+            example: {
+                "data": {
+                    "reservation": {
+                        "id": "85be7d50-060f-4de0-ba3f-8e601decf0d7",
+                        "comment": "Just a simple comment",
+                        "startDate": "2024-02-17T00:00:00.000Z",
+                        "endDate": "2024-02-22T00:00:00.000Z",
+                        "status": -1,
+                        "createdAt": "2024-01-24T18:50:52.528Z",
+                        "updatedAt": "2024-01-24T21:26:37.618Z",
+                        "user": {
+                            "id": "43a54d35-dd62-410d-91ab-b35324e620d4",
+                            "email": "sergey.donchenko@gmail.com",
+                            "fullname": "Serhii",
+                            "address": null,
+                            "phone": "+380663665112",
+                            "createdAt": "2024-01-24T16:17:13.226Z",
+                            "updatedAt": "2024-01-24T16:17:13.226Z"
+                        },
+                        "room": {
+                            "id": "853af878-1a61-49f9-8801-c2203fa9f642",
+                            "title": "152",
+                            "description": "Turba cursim speculum sto.",
+                            "createdAt": "2024-01-24T14:33:05.746Z",
+                            "updatedAt": "2024-01-24T14:33:05.746Z"
+                        }
+                    }
+                },
+                "success": true,
+                "path": "/reservations/85be7d50-060f-4de0-ba3f-8e601decf0d7/cancel",
+                "status": 200
+            }
+        },
+    })
+    @ApiBadRequestResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Exception when user tries to cancel reservation one more time.',
+        schema: {
+            example: {
+                "data": {},
+                "success": false,
+                "status": 400,
+                "message": "Room reservation has been already cancelled.",
+                "timestamp": "2024-01-24T21:31:14.778Z",
+                "path": "/reservations/85be7d50-060f-4de0-ba3f-8e601decf0d7/cancel"
+            }
+        },
+    })
+    async setReservationCancelledById(
+        @Param('reservationId') reservationId: string
+    ): Promise<any> {
+        const reservation = await this.reservationsService
+            .get(
+                reservationId,
+                true,
+                { user: true, room: true }
+            )
+
+        if (this.reservationsService.isStatusCancelled(reservation)) {
+            throw new BadRequestException('Room reservation has been already cancelled.');
+        }
+
+        // update the status
+        const updatedReservation = await this.reservationsService
+            .setStatusCancelled(reservation)
+
+        // Emit event on reservation cancelled
+        this.emitter.emitReservationCancelledEvent(updatedReservation)
+
+        return {
+            reservation: updatedReservation
+        };
     }
 }

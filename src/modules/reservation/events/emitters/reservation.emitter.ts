@@ -5,7 +5,12 @@ import { EventEmitter2 } from "@nestjs/event-emitter"
 import {
   ReservationCreatedEvent,
   EVENT_RESERVATION_CREATED,
-} from '../reservationCreated.event';
+} from "../reservationCreated.event"
+
+import {
+  EVENT_RESERVATION_CANCELLED,
+  ReservationCancelledEvent
+} from "../reservationCancelled.event"
 
 @Injectable()
 export class ReservationEmitter {
@@ -30,4 +35,22 @@ export class ReservationEmitter {
 
     return true;
   }
+  /**
+   * @desc Generates event on reservation cancelled
+   * @param {IReservation} reservation
+   * @return {boolean}
+   **/
+  emitReservationCancelledEvent(reservation: IReservation): boolean {
+    this.logger.debug(`Emitting "${EVENT_RESERVATION_CANCELLED}" event.`);
+    this.eventEmitter
+        .emitAsync(EVENT_RESERVATION_CANCELLED, new ReservationCancelledEvent(reservation))
+        .then(() =>
+            this.logger.debug(
+                `Event "${EVENT_RESERVATION_CANCELLED}" has just been handled.`,
+            ),
+        );
+
+    return true;
+  }
+
 }
