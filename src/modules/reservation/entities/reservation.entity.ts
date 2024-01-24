@@ -11,7 +11,7 @@ import {
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, Index,
 } from "typeorm"
 
 import {
@@ -20,6 +20,11 @@ import {
 } from "../reservation.constants";
 
 @Entity({ name: 'reservations' })
+@Index('Reservation_By_Room_And_Status',[
+    'room',
+    'status',
+    'startDate'
+])
 export class ReservationEntity implements IReservation {
     @ApiProperty({
         example: 'e53d8bb0-6728-4e04-9a8e-fc6a20eb9acc',
