@@ -1,7 +1,7 @@
 import {IHotel} from "../interfaces"
+import { CacheInterceptor } from "@nestjs/cache-manager"
 import {QueryParamsDTO} from "../../../common/dto/queryParams.dto";
 import { Public } from "../../../common/decorators/public.decorator"
-
 import {
     HotelsService,
     HotelRoomsService
@@ -34,7 +34,6 @@ import {
     ApiUnauthorizedResponse,
 } from "@nestjs/swagger"
 
-
 @ApiTags('The hotel API ')
 @Controller('hotels')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -48,6 +47,7 @@ export class HotelController {
     @Public()
     @Get('/')
     @HttpCode(HttpStatus.OK)
+    @UseInterceptors(CacheInterceptor)
     @SerializeOptions({groups: [GROUP_ALL_HOTELS]})
     @ApiOperation({summary: 'Provides a list of active hotels in the system.'})
     @ApiOkResponse({
@@ -105,6 +105,7 @@ export class HotelController {
             GROUP_ALL_HOTEL_ROOMS
         ]
     })
+    @UseInterceptors(CacheInterceptor)
     @ApiOperation({summary: 'Provides a list of active hotel\'s room in the system.'})
     @ApiOkResponse({
         status: HttpStatus.OK,

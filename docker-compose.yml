@@ -18,8 +18,12 @@ services:
     container_name: redis_room_booking
     restart: always
     image: redis:6.0-alpine
-    expose:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+    ports:
+      - "${CACHE_PROVIDER_PORT}:${CACHE_PROVIDER_PORT}"
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${CACHE_PROVIDER_PASSWORD}
+    environment:
+      - REDIS_PASSWORD=${CACHE_PROVIDER_PASSWORD}
+      - REDIS_PORT=${CACHE_PROVIDER_PORT}
     volumes:
       - redis_room_booking:/data/redis-room-booking
 

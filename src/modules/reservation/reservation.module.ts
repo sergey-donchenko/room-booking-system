@@ -5,6 +5,7 @@ import { Module, forwardRef } from "@nestjs/common"
 import {ReservationsService} from "./services";
 import {HotelModule} from "../hotel/hotel.module";
 import {UserModule} from "../user/user.module";
+import {ReservationEmitter} from "./events/emitters";
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import {UserModule} from "../user/user.module";
   ],
   controllers: [ ReservationsController ],
   providers: [
-    ReservationsService
+    ReservationsService,
+    ReservationEmitter
   ],
   exports: [
     ReservationsService

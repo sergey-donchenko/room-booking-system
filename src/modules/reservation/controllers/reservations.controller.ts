@@ -1,30 +1,35 @@
-import {
-    HttpCode,
-    Controller,
-    UseInterceptors,
-    ClassSerializerInterceptor, Get, HttpStatus, SerializeOptions, Query, Post, Body, Param
-} from '@nestjs/common';
+import { IReservation } from "../interfaces"
+import { IUser } from "../../user/interfaces"
+import { ReservationsService } from "../services"
+import { UsersService } from "../../user/services"
+import { IHotelRoom } from "../../hotel/interfaces"
+import { ReservationEmitter } from "../events/emitters"
+import { Public } from "../../../common/decorators/public.decorator"
+import { GROUP_RESERVATION } from "../reservation.constants"
+import { CreateReservationDTO } from "../dto/createReservation.dto";
 
 import {
-    ApiBody,
+    Post,
+    Body,
+    Param,
+    HttpCode,
+    HttpStatus,
+    Controller,
+    UseInterceptors,
+    SerializeOptions,
+    ClassSerializerInterceptor
+} from "@nestjs/common"
+
+import {
     ApiTags,
-    ApiHeader,
     ApiOperation,
     ApiOkResponse,
-    ApiForbiddenResponse,
-    ApiBadRequestResponse,
-    ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import {HotelRoomsService, HotelsService} from "../../hotel/services";
-import {Public} from "../../../common/decorators/public.decorator";
-import {GROUP_ALL_HOTELS} from "../../hotel/constants";
-import {QueryParamsDTO} from "../../../common/dto/queryParams.dto";
-import {GROUP_RESERVATION} from "../reservation.constants";
-import {CreateReservationDTO} from "../dto/createReservation.dto";
-import {ReservationsService} from "../services";
-import {IHotelRoom} from "../../hotel/interfaces";
-import {IUser} from "../../user/interfaces";
-import {UsersService} from "../../user/services";
+} from "@nestjs/swagger"
+
+import {
+    HotelsService,
+    HotelRoomsService
+} from "../../hotel/services"
 
 @ApiTags('The reservations API')
 @Controller('reservations')
@@ -35,6 +40,7 @@ export class ReservationsController {
         private readonly hotelRoomsService: HotelRoomsService,
         private readonly reservationsService: ReservationsService,
         private readonly usersService: UsersService,
+        private readonly emitter: ReservationEmitter
     ) {
     }
 
@@ -75,7 +81,8 @@ export class ReservationsController {
             fullname: clientName
         })
 
-        const reservation = await this.reservationsService.createReservation({
+        // Create reservation
+        const reservation: IReservation = await this.reservationsService.createReservation({
             room,
             user,
             comment,
@@ -83,6 +90,11 @@ export class ReservationsController {
             startDate,
         })
 
-        return {}
+        // Emit create reservation event
+        this.emitter.emitReservationCreatedEvent(reservation)
+
+        return {
+            reservation
+        }
     }
 }
