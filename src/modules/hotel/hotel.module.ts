@@ -1,9 +1,20 @@
-import {HotelController} from "./controllers"
 import {TypeOrmModule} from "@nestjs/typeorm"
 import {Module, forwardRef} from "@nestjs/common"
-import {HotelEntity, HotelRoomEntity} from "./entities";
-import {HotelsService} from "./services/hotel.service";
 
+import {
+    HotelController,
+    HotelRoomsController
+} from "./controllers"
+
+import {
+    HotelEntity,
+    HotelRoomEntity
+} from "./entities"
+
+import {
+    HotelsService,
+    HotelRoomsService
+} from "./services";
 
 @Module({
     imports: [
@@ -12,12 +23,17 @@ import {HotelsService} from "./services/hotel.service";
             HotelRoomEntity
         ]),
     ],
-    controllers: [HotelController],
+    controllers: [
+        HotelController,
+        HotelRoomsController
+    ],
     providers: [
-        HotelsService
+        HotelsService,
+        HotelRoomsService
     ],
     exports: [
-        HotelsService
+        HotelsService,
+        HotelRoomsService
     ],
 })
 export class HotelModule {
