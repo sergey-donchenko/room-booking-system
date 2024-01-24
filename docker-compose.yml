@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  postgres_room_booking:
+    container_name: postgres_room_booking
+    restart: always
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=${DATABASE_DB_NAME}
+      - POSTGRES_DATA=${DATABASE_DATA}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
+    volumes:
+      - postgres_room_booking:/var/lib/postgresql/data/
+  redis_room_booking:
+    container_name: redis_room_booking
+    restart: always
+    image: redis:6.0-alpine
+    expose:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis_room_booking:/data/redis-room-booking
+
+volumes:
+  postgres_room_booking:
+    external: true
+  redis_room_booking:
+    driver: local
+
+networks:
+  default:
+    name: room_booking
+    external: true
