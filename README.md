@@ -98,6 +98,10 @@ In order to start using the system, it's required to add some data into the data
 - Create 5 dummy hotels with rooms -> `npm run seed:create-dummy-hotels`
 - Create 5 dummy users -> `npm run seed:create-dummy-users`
 
+## Swagger documentation page
+
+The swagger documentation page is hosted on the same host as server itself by adding the url `/api`, i.e. if in configuration `APP_PORT` -> `9001` then the swagger page will have an address like `http://localhost:9001/api#/`
+
 ## License
 
 Nest is [MIT licensed](LICENSE).
