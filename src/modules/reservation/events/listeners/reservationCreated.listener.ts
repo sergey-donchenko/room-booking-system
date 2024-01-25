@@ -11,6 +11,7 @@ import {
     ReservationCreatedEvent,
     EVENT_RESERVATION_CREATED,
 } from "../reservationCreated.event"
+import {HotelRoomsService} from "../../../hotel/services";
 
 @Injectable()
 export class ReservationCreatedListener {
@@ -18,7 +19,7 @@ export class ReservationCreatedListener {
 
     constructor(
         private readonly mailService: MailService,
-        private readonly appConfig: AppConfigService
+        private readonly hotelRoomsService: HotelRoomsService
     ) {
     }
 
@@ -34,7 +35,7 @@ export class ReservationCreatedListener {
     @OnEvent(EVENT_RESERVATION_CREATED)
     sendEmailOnReservationCreated(event: ReservationCreatedEvent) {
         this.logger.debug(
-            `Send admin emails on class created ${JSON.stringify(event)}.`,
+            `Send admin emails on reservations ${JSON.stringify(event)}.`,
         );
 
         // it must be done using the queue

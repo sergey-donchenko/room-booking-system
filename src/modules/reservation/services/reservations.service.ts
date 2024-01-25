@@ -5,6 +5,7 @@ import {InjectRepository} from "@nestjs/typeorm"
 import {Injectable, NotFoundException} from "@nestjs/common"
 import {IHotelRoom} from "../../hotel/interfaces";
 import {EReservationStatus} from "../enum/reservation.enum";
+import {SelectQueryBuilder} from "typeorm/query-builder/SelectQueryBuilder";
 
 @Injectable()
 export class ReservationsService {
@@ -34,19 +35,16 @@ export class ReservationsService {
         return this.reservationRepository.save(input);
     }
 
-    async isRoomAvailableForReservation(
-        room: IHotelRoom,
-        startDate: Date,
-        endDate: Date
-    ): Promise<boolean> {
-        // if operation is in the past
-        if (startDate.getTime() < Date.now() || endDate.getTime() < Date.now()) return false
-
-        const reservation: boolean = await this.reservationRepository
+    buildAvailabilityQuery(startDate?: Date, endDate?: Date): SelectQueryBuilder<ReservationEntity> {
+        const query = this.reservationRepository
             .createQueryBuilder('reservations')
-            .where('reservations.roomId = :roomId', { roomId: room?.id })
-            .andWhere('reservations.status = :status', { status: EReservationStatus.ACTIVE })
-            .andWhere(new Brackets((qb) => {
+            .where('reservations.status = :status', { status: EReservationStatus.ACTIVE });
+
+        if (!startDate || !endDate) {
+            return query.andWhere('reservations.endDate > :endDate', {endDate: new Date()})
+        }
+
+        return query.andWhere(new Brackets((qb) => {
                 qb
                     .where(
                         new Brackets((qs1) => {
@@ -61,6 +59,24 @@ export class ReservationsService {
                         })
                     )
             }))
+    }
+
+    buildBusyRoomQuery(startDate?: Date, endDate?: Date):SelectQueryBuilder<ReservationEntity> {
+        return this.buildAvailabilityQuery(startDate, endDate)
+            .innerJoin('reservations.room', 'room')
+            .select('room.id')
+    }
+
+    async isRoomAvailableForReservation(
+        room: IHotelRoom,
+        startDate: Date,
+        endDate: Date
+    ): Promise<boolean> {
+        // if operation is in the past
+        if (startDate.getTime() < Date.now() || endDate.getTime() < Date.now()) return false
+
+        const reservation: boolean = await this.buildAvailabilityQuery(startDate, endDate)
+            .andWhere('reservations.roomId = :roomId', { roomId: room?.id })
             .getExists()
 
         return !reservation
@@ -77,4 +93,5 @@ export class ReservationsService {
     isStatusCancelled(reservation: IReservation): boolean {
         return reservation?.status === EReservationStatus.CANCELLED
     }
+
 }

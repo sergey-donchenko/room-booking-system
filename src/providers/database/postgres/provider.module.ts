@@ -50,6 +50,6 @@ import {
       },
       inject: [DatabaseConfigService],
     } as TypeOrmModuleAsyncOptions),
-  ],
+  ]
 })
 export class PostgresDatabaseProviderModule {}

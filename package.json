@@ -1,12 +1,12 @@
 {
   "name": "room-booking",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "app:env:init": "[ -f \".env\" ] || { NORMAL=$(tput sgr0);RED=$(tput setaf 1);echo \"${RED}File .env does not exists! Please run NPM RUN COPY:ENV to create it or do it manually.${NORMAL}\"; exit 1;} && npm run docker:create:network && npm run docker:create:volume && npm run docker:up",
+    "app:env:init": "[ -f \".env\" ] || { NORMAL=$(tput sgr0);RED=$(tput setaf 1);echo \"${RED}File .env does not exists! Please run NPM RUN COPY:ENV to create it or do it manually.${NORMAL}\"; exit 1;} && npm run docker:create:network && npm run docker:create:volume && npm run docker:up && npm run migration:run && npm run seed:create-dummy-hotels",
     "env:config:copy": "cp -n .env.example .env 2>/dev/null",
     "docker:create:network": "docker network inspect room_booking >/dev/null 2>&1 || docker network create --driver bridge room_booking",
     "docker:create:volume": "docker volume create --name=postgres_room_booking",

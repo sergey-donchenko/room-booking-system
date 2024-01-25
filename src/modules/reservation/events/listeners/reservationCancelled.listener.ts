@@ -44,8 +44,5 @@ export class ReservationCancelledListener {
             `Clear related to the reservation cache ${JSON.stringify(event)}.`,
         );
 
-        const keys = await this.cacheManager.keys()
-
-        console.log()
     }
 }

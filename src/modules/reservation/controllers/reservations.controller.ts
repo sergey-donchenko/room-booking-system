@@ -31,9 +31,10 @@ import {
     HotelRoomsService
 } from "../../hotel/services"
 import {GROUP_USER} from "../../user/user.constant";
-import {GROUP_ALL_HOTELS, GROUP_HOTEL_ROOM} from "../../hotel/constants";
+import {GROUP_ALL_HOTEL_ROOMS, GROUP_ALL_HOTELS, GROUP_HOTEL_ROOM} from "../../hotel/constants";
 import {CacheInterceptor, CacheTTL} from "@nestjs/cache-manager";
 import {QueryParamsDTO} from "../../../common/dto/queryParams.dto";
+import {QueryRoomAvailabilityParamsDTO} from "../dto/queryRoomsAvailability.dto";
 
 @ApiTags('The reservations API')
 @Controller('reservations')
@@ -46,6 +47,76 @@ export class ReservationsController {
         private readonly usersService: UsersService,
         private readonly emitter: ReservationEmitter
     ) {
+    }
+
+    @Public()
+    @Get('/rooms-availability')
+    @HttpCode(HttpStatus.OK)
+    //@UseInterceptors(CacheInterceptor)
+    @SerializeOptions({
+        groups: [ GROUP_ALL_HOTEL_ROOMS ]
+    })
+    @ApiOperation({summary: 'Provides rooms availability.'})
+    @ApiOkResponse({
+        status: HttpStatus.OK,
+        description: 'The list of the available rooms in the system.',
+        schema: {
+            example: {
+                "data": {
+                    "rooms": [
+                        {
+                            "id": "0252dad9-212f-4225-8813-4bcd9da7cd6b",
+                            "title": "105",
+                            "description": "Dens ventus adeptio subito auditor tolero ante. Cibus spes candidus adduco. Appello apud carmen.",
+                            "createdAt": "2024-01-24T14:33:05.749Z",
+                            "updatedAt": "2024-01-24T14:33:05.749Z"
+                        }
+                    ],
+                    "total": 26,
+                    "page": 0,
+                    "limit": 10,
+                    "keywords": "",
+                    "startDate": "2024-01-31T00:00:00.000Z",
+                    "endDate": "2024-02-01T00:00:00.000Z"
+                },
+                "success": true,
+                "path": "/reservations/rooms-availability?startDate=2024-01-31&endDate=2024-02-01",
+                "status": 200
+            }
+        },
+    })
+    async getRoomsAvailability(
+        @Query() queryParams: QueryRoomAvailabilityParamsDTO,
+    ): Promise<any> {
+        const {
+            page,
+            limit,
+            keywords,
+            endDate=null,
+            startDate=null
+        } = queryParams || {};
+
+        // Build busy room query
+        const busyRooms: any = this.reservationsService.buildBusyRoomQuery(startDate, endDate)
+
+        const [rooms, total] = await this.hotelRoomsService
+            .getRoomsByAvailability(busyRooms, {
+                page,
+                limit,
+                keywords,
+                startDate,
+                endDate
+            })
+
+        return {
+            rooms,
+            total,
+            page,
+            limit,
+            keywords,
+            startDate,
+            endDate
+        };
     }
 
     @Public()
@@ -314,4 +385,6 @@ export class ReservationsController {
             reservation: updatedReservation
         };
     }
+
+
 }

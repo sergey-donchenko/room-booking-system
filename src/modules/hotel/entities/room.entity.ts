@@ -6,19 +6,18 @@ import { ESystemStatus } from "../../../common/enum/status.enum"
 import {
     Entity,
     Column,
-    OneToOne,
-    JoinTable,
     ManyToOne,
     CreateDateColumn,
     UpdateDateColumn,
-    PrimaryGeneratedColumn, OneToMany,
+    PrimaryGeneratedColumn,
+    OneToMany,
 } from "typeorm"
 
 import {
     GROUP_HOTEL_ROOM,
     GROUP_ALL_HOTEL_ROOMS
 } from "../constants"
-import {IReservation} from "../../reservation/interfaces/reservation.interface";
+import {IReservation} from "../../reservation/interfaces";
 
 @Entity({ name: 'hotel_rooms' })
 export class HotelRoomEntity implements IHotelRoom {

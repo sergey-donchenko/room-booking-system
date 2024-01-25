@@ -1,0 +1,238 @@
+{
+	"info": {
+		"_postman_id": "ad2fb77c-8c9e-4884-9662-e39206c95f55",
+		"name": "Develop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "335565",
+		"_collection_link": "https://www.postman.com/sdonchenko/workspace/room-booking/collection/335565-ad2fb77c-8c9e-4884-9662-e39206c95f55?action=share&source=collection_link&creator=335565"
+	},
+	"item": [
+		{
+			"name": "Hotels in the system",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('response is ok', function() {",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(responseJson.status).to.eql(200);",
+							"    pm.expect(responseJson.success).to.eql(true);",
+							"});",
+							"",
+							"pm.test('response has appropriate data', function() {",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.data.hotels).to.be.an(\"array\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/hotels",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"hotels"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Rooms by the hotel ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('response is ok', function() {",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(responseJson.status).to.eql(200);",
+							"    pm.expect(responseJson.success).to.eql(true);",
+							"});",
+							"",
+							"pm.test('response has appropriate data', function() {",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.data.hotel).to.be.an(\"object\");",
+							"    pm.expect(responseJson.data.rooms).to.be.an(\"array\");",
+							"    pm.expect(responseJson.data.page).to.be.an(\"number\");",
+							"    pm.expect(responseJson.data.limit).to.be.an(\"number\");",
+							"    pm.expect(responseJson.data.total).to.be.an(\"number\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/hotels/f0ec43cb-a338-4147-b310-402b0e4a9c72/rooms",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"hotels",
+						"f0ec43cb-a338-4147-b310-402b0e4a9c72",
+						"rooms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book a room",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"startDate\": \"2024-01-30\",\n    \"endDate\": \"2024-02-15\",\n    \"clientName\": \"Serhii\",\n    \"clientPhone\": \"+380663665112\",\n    \"clientEmail\": \"sergey.donchenko@gmail.com\",\n    \"comment\": \"Just a simple comment\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/reservations/853af878-1a61-49f9-8801-c2203fa9f642/book",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reservations",
+						"853af878-1a61-49f9-8801-c2203fa9f642",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reservation by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"startDate\": \"2024-02-17\",\n    \"endDate\": \"2024-02-22\",\n    \"clientName\": \"Serhii\",\n    \"clientPhone\": \"+380663665112\",\n    \"clientEmail\": \"sergey.donchenko@gmail.com\",\n    \"comment\": \"Just a simple comment\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/reservations/85be7d50-060f-4de0-ba3f-8e601decf0d7",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reservations",
+						"85be7d50-060f-4de0-ba3f-8e601decf0d7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Reservation by ID",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"startDate\": \"2024-02-17\",\n    \"endDate\": \"2024-02-22\",\n    \"clientName\": \"Serhii\",\n    \"clientPhone\": \"+380663665112\",\n    \"clientEmail\": \"sergey.donchenko@gmail.com\",\n    \"comment\": \"Just a simple comment\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/reservations/85be7d50-060f-4de0-ba3f-8e601decf0d7/cancel",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reservations",
+						"85be7d50-060f-4de0-ba3f-8e601decf0d7",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List of available rooms ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('response is ok', function() {",
+							"    const responseJson = pm.response.json();",
+							"    ",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(responseJson.status).to.eql(200);",
+							"    pm.expect(responseJson.success).to.eql(true);",
+							"});",
+							"",
+							"pm.test('response has appropriate data', function() {",
+							"    const responseJson = pm.response.json();",
+							"",
+							"    pm.expect(responseJson.data.hotel).to.be.an(\"object\");",
+							"    pm.expect(responseJson.data.rooms).to.be.an(\"array\");",
+							"    pm.expect(responseJson.data.page).to.be.an(\"number\");",
+							"    pm.expect(responseJson.data.limit).to.be.an(\"number\");",
+							"    pm.expect(responseJson.data.total).to.be.an(\"number\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/reservations/rooms-availability?startDate=2024-01-31&endDate=2024-02-01",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reservations",
+						"rooms-availability"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2024-01-31"
+						},
+						{
+							"key": "endDate",
+							"value": "2024-02-01"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
