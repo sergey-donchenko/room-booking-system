@@ -1,6 +1,8 @@
-import {OnEvent} from '@nestjs/event-emitter';
-import {AppConfigService} from "../../../../config/app/config.service"
-import {MailService} from "../../../../providers/email/provider.service"
+import { Queue } from "bull"
+import { InjectQueue } from "@nestjs/bull"
+import { OnEvent } from "@nestjs/event-emitter"
+import { HotelRoomsService } from "../../../hotel/services"
+import { MailService } from "../../../../providers/email/provider.service"
 
 import {
     Logger,
@@ -11,7 +13,7 @@ import {
     ReservationCreatedEvent,
     EVENT_RESERVATION_CREATED,
 } from "../reservationCreated.event"
-import {HotelRoomsService} from "../../../hotel/services";
+import {QUEUE_MAIL} from "../../../../common/constants/queue.constants";
 
 @Injectable()
 export class ReservationCreatedListener {
@@ -19,7 +21,8 @@ export class ReservationCreatedListener {
 
     constructor(
         private readonly mailService: MailService,
-        private readonly hotelRoomsService: HotelRoomsService
+        private readonly hotelRoomsService: HotelRoomsService,
+        @InjectQueue(QUEUE_MAIL) private readonly mailQueue: Queue
     ) {
     }
 
@@ -38,11 +41,11 @@ export class ReservationCreatedListener {
             `Send admin emails on reservations ${JSON.stringify(event)}.`,
         );
 
-        // it must be done using the queue
-        return this.mailService.send({
+        // Add job
+        this.mailQueue.add('sendEmailOnReservationCreated', {
             to: '',
             subject: 'Thank you for you reservation.',
             body: `Hi there,\n\n Here will be some messages.`,
-        })
+        }).then(() => this.logger.debug('Job successfully queued.'))
     }
 }
