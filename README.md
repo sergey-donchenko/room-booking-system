@@ -13,25 +13,29 @@ $ npm install
 Copy content of the `.env.example` to newly created file `.env`, so run
 
 ```bash
-# npm run env:config:copy
+$ npm run env:config:copy
 ```
 
 ### Docker container and required services 
 
 ```bash
-# npm run app:env:init
+$ npm run app:env:init
 ```
 
-the above command creates:
-- docker network
-- docker data volume for postgres
-- create database with name configured in `.env`
 
-That's it! And now we can run the server and start testing the API!  
+That's it! Now we can run the server and start testing the API!  
 
 ```bash
-# npm run start:dev
+$ npm run start:dev
 ```
+
+## Postman collection
+
+To speed up the development process you can use prepared collection of end-points in [Develop.postman_collection.json](./schema/Develop.postman_collection.json)
+
+## Swagger documentation page
+
+The swagger documentation page is hosted on the same host as server itself by adding the url `/api`, i.e. if in configuration `APP_PORT` -> `9001` then the swagger page will have an address like [Swagger Page](http://localhost:9001/api#/)
 
 ## Database 
 The database schema looks like the folowing:
@@ -51,14 +55,6 @@ There are a few commands that could help in managing them:
 In order to start using the system, it's required to add some data into the database. 
 - Create 5 dummy hotels with rooms -> `npm run seed:create-dummy-hotels`
 - Create 5 dummy users -> `npm run seed:create-dummy-users`
-
-## Swagger documentation page
-
-The swagger documentation page is hosted on the same host as server itself by adding the url `/api`, i.e. if in configuration `APP_PORT` -> `9001` then the swagger page will have an address like `http://localhost:9001/api#/`
-
-## Postman collection
-
-To speed up the development process you can use prepared collection of end-points in [Develop.postman_collection.json](./schema/Develop.postman_collection.json)
 
 ## Running the app
 
